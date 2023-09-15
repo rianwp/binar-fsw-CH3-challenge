@@ -5,14 +5,14 @@ const fs = require("fs")
 const dataCars = fs.readFileSync(`${__dirname}/data/data.json`, "utf-8")
 const dataCarsJson = [...JSON.parse(dataCars)]
 
-function isRequiredPropsExist(props) {
+function isRequiredPropsValid(props) {
   const requiredProps = ["id", "plate", "manufacture", "model"]
   for(const prop of requiredProps) {
-    if(typeof props[prop] === "undefined") {
-      return false
+    if(typeof props[prop] === "string") {
+      return true
     }
   }
-  return true
+  return false
 }
 
 function setHeader(res) {
@@ -56,7 +56,7 @@ app.get("/cars/:id", (req, res) => {
 app.post("/cars", (req, res) => {
   setHeader(res)
 
-  if(isRequiredPropsExist(req.body)) {
+  if(isRequiredPropsValid(req.body)) {
     const { id, plate, manufacture, model, image, rentPerDay, capacity, description, availableAt, transmission, available, type, year, options, specs } = req.body
     const addedCar = {
       id,
@@ -79,7 +79,7 @@ app.post("/cars", (req, res) => {
     return res.status(201).json(dataCarsJson)
   }
   res.status(400).json({ 
-    message: "Request body harus memiliki id, plate, manufacture, dan model",
+    message: "Request body harus memiliki id, plate, manufacture, dan model dengan format string",
   })
 })
 
