@@ -8,11 +8,11 @@ const dataCarsJson = [...JSON.parse(dataCars)]
 function isRequiredPropsValid(props) {
   const requiredProps = ["id", "plate", "manufacture", "model"]
   for(const prop of requiredProps) {
-    if(typeof props[prop] === "string") {
-      return true
+    if(typeof props[prop] !== "string") {
+      return false
     }
   }
-  return false
+  return true
 }
 
 function setHeader(res) {
