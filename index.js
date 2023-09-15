@@ -49,7 +49,7 @@ app.get("/cars/:id", (req, res) => {
   }
   
   res.status(404).json({ 
-    message: "Data tidak ditemukan",
+    message: "Data dengan id tersebut tidak ditemukan",
   })
 })
 
