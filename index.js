@@ -2,6 +2,8 @@ const express = require("express")
 const app = express()
 const fs = require("fs")
 
+app.use(express.json())
+
 const dataCarsJson = fs.readFileSync(`${__dirname}/data/data.json`, "utf-8")
 const dataCars = [...JSON.parse(dataCarsJson)]
 
