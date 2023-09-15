@@ -123,9 +123,9 @@ app.delete("/cars/:id", (req, res) => {
 
   for(let i = 0; i < dataCarsJson.length; i++) {
     if(dataCarsJson[i].id === id) {
-      const deletedData = dataCarsJson[i]
+      const deletedCar = dataCarsJson[i]
       dataCarsJson.splice(i, 1)
-      return res.status(200).json(deletedData)
+      return res.status(200).json(deletedCar)
     }
   }
   res.status(404).json({ 
