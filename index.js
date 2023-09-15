@@ -2,8 +2,8 @@ const express = require("express")
 const app = express()
 const fs = require("fs")
 
-const dataCars = fs.readFileSync(`${__dirname}/data/data.json`, "utf-8")
-const dataCarsJson = [...JSON.parse(dataCars)]
+const dataCarsJson = fs.readFileSync(`${__dirname}/data/data.json`, "utf-8")
+const dataCars = [...JSON.parse(dataCarsJson)]
 
 function isRequiredPropsValid(props) {
   const requiredProps = ["id", "plate", "manufacture", "model"]
@@ -34,7 +34,7 @@ app.get("/", (req, res) => {
 
 app.get("/cars", (req, res) => {
   setHeader(res)
-  res.status(200).json(dataCarsJson)
+  res.status(200).json(dataCars)
 })
 
 app.get("/cars/:id", (req, res) => {
@@ -42,9 +42,9 @@ app.get("/cars/:id", (req, res) => {
 
   const id = req.params.id
 
-  for(let i = 0; i < dataCarsJson.length; i++) {
-    if(dataCarsJson[i].id === id) {
-      return res.status(200).json(dataCarsJson[i])
+  for(let i = 0; i < dataCars.length; i++) {
+    if(dataCars[i].id === id) {
+      return res.status(200).json(dataCars[i])
     }
   }
   
@@ -75,8 +75,8 @@ app.post("/cars", (req, res) => {
       options: isArrayofStrings(options) ? options : [],
       specs: isArrayofStrings(specs) ? specs : []
     }
-    dataCarsJson.push(addedCar)
-    return res.status(201).json(dataCarsJson)
+    dataCars.push(addedCar)
+    return res.status(201).json(dataCars)
   }
   res.status(400).json({ 
     message: "Request body harus memiliki id, plate, manufacture, dan model dengan format string",
@@ -88,27 +88,27 @@ app.put("/cars/:id", (req, res) => {
   
   const id = req.params.id
 
-  for(let i = 0; i < dataCarsJson.length; i++) {
-    if(dataCarsJson[i].id === id) {
+  for(let i = 0; i < dataCars.length; i++) {
+    if(dataCars[i].id === id) {
       const { plate, manufacture, model, image, rentPerDay, capacity, description, availableAt, transmission, available, type, year, options, specs } = req.body
       const updatedCar = {
-        id: dataCarsJson[i].id,
-        plate: typeof model === "string" ? plate : dataCarsJson[i].plate,
-        manufacture: typeof model === "string" ? manufacture : dataCarsJson[i].manufacture,
-        model: typeof model === "string" ? model : dataCarsJson[i].model,
-        image: typeof image === "string" ? image : dataCarsJson[i].image,
-        rentPerDay: typeof rentPerDay === "number" ? rentPerDay : dataCarsJson[i].rentPerDay,
-        capacity: typeof capacity === "number" ? capacity : dataCarsJson[i].capacity,
-        description: typeof description === "string" ? description : dataCarsJson[i].description,
-        availableAt: typeof availableAt === "string" ? availableAt : dataCarsJson[i].availableAt,
-        transmission: typeof transmission === "string" ? transmission : dataCarsJson[i].transmission,
-        available: typeof available === "boolean" ? available : dataCarsJson[i].available,
-        type: typeof type === "string" ? type : dataCarsJson[i].type,
-        year: typeof year === "number" ? year : dataCarsJson[i].year,
-        options: isArrayofStrings(options) ? options : dataCarsJson[i].options,
-        specs: isArrayofStrings(specs) ? specs : dataCarsJson[i].specs
+        id: dataCars[i].id,
+        plate: typeof model === "string" ? plate : dataCars[i].plate,
+        manufacture: typeof model === "string" ? manufacture : dataCars[i].manufacture,
+        model: typeof model === "string" ? model : dataCars[i].model,
+        image: typeof image === "string" ? image : dataCars[i].image,
+        rentPerDay: typeof rentPerDay === "number" ? rentPerDay : dataCars[i].rentPerDay,
+        capacity: typeof capacity === "number" ? capacity : dataCars[i].capacity,
+        description: typeof description === "string" ? description : dataCars[i].description,
+        availableAt: typeof availableAt === "string" ? availableAt : dataCars[i].availableAt,
+        transmission: typeof transmission === "string" ? transmission : dataCars[i].transmission,
+        available: typeof available === "boolean" ? available : dataCars[i].available,
+        type: typeof type === "string" ? type : dataCars[i].type,
+        year: typeof year === "number" ? year : dataCars[i].year,
+        options: isArrayofStrings(options) ? options : dataCars[i].options,
+        specs: isArrayofStrings(specs) ? specs : dataCars[i].specs
       }
-      dataCarsJson[i] = updatedCar
+      dataCars[i] = updatedCar
       return res.status(201).json(updatedCar)
     }
   }
@@ -121,10 +121,10 @@ app.delete("/cars/:id", (req, res) => {
   setHeader(res)
   const id = req.params.id
 
-  for(let i = 0; i < dataCarsJson.length; i++) {
-    if(dataCarsJson[i].id === id) {
-      const deletedCar = dataCarsJson[i]
-      dataCarsJson.splice(i, 1)
+  for(let i = 0; i < dataCars.length; i++) {
+    if(dataCars[i].id === id) {
+      const deletedCar = dataCars[i]
+      dataCars.splice(i, 1)
       return res.status(200).json(deletedCar)
     }
   }
