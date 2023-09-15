@@ -119,6 +119,7 @@ app.put("/cars/:id", (req, res) => {
 
 app.delete("/cars/:id", (req, res) => {
   setHeader(res)
+  
   const id = req.params.id
 
   for(let i = 0; i < dataCars.length; i++) {
