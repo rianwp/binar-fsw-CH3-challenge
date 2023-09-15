@@ -109,7 +109,7 @@ app.put("/cars/:id", (req, res) => {
         specs: isArrayofStrings(specs) ? specs : dataCars[i].specs
       }
       dataCars[i] = updatedCar
-      return res.status(201).json(updatedCar)
+      return res.status(200).json(updatedCar)
     }
   }
   res.status(404).json({ 
@@ -119,7 +119,7 @@ app.put("/cars/:id", (req, res) => {
 
 app.delete("/cars/:id", (req, res) => {
   setHeader(res)
-  
+
   const id = req.params.id
 
   for(let i = 0; i < dataCars.length; i++) {
