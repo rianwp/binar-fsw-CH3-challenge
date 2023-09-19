@@ -6,7 +6,9 @@ app.use(express.json())
 
 const port = process.env.port || 8000
 
-const dataCarsJson = fs.readFileSync(`${__dirname}/data/data.json`, "utf-8")
+const dataCarsPath = `${__dirname}/data/data.json`
+
+const dataCarsJson = fs.readFileSync(dataCarsPath, "utf-8")
 const dataCars = [...JSON.parse(dataCarsJson)]
 
 function isRequiredPropsValid(props) {
@@ -55,12 +57,13 @@ app.get("/cars/:id", (req, res) => {
   }
   
   res.status(404).json({ 
-    status: "fail",
-    message: "Data dengan id tersebut tidak ditemukan",
+    status: "failed",
+    message: `Data dengan id ${id} tidak ditemukan`,
   })
 })
 
 app.post("/cars", (req, res) => {
+  // terdapat validasi untuk add data, jadi format harus sesuai dengan satuan data pada json
   if(isRequiredPropsValid(req.body)) {
     const { id, plate, manufacture, model, image, rentPerDay, capacity, description, availableAt, transmission, available, type, year, options, specs } = req.body
     const addedCar = {
@@ -81,20 +84,22 @@ app.post("/cars", (req, res) => {
       specs: isArrayofStrings(specs) ? specs : []
     }
     dataCars.push(addedCar)
+    fs.writeFileSync(dataCarsPath, JSON.stringify(dataCars))
     return res.status(201).json({
       status: "success",
       data: {
         cars: dataCars
       }
     })
-  }
+  }  
   res.status(400).json({ 
-    status: "fail",
+    status: "failed",
     message: "Request body harus memiliki id, plate, manufacture, dan model dengan format string",
   })
 })
 
 app.put("/cars/:id", (req, res) => {
+  // terdapat validasi untuk update data
   const id = req.params.id
 
   for(let i = 0; i < dataCars.length; i++) {
@@ -118,6 +123,7 @@ app.put("/cars/:id", (req, res) => {
         specs: isArrayofStrings(specs) ? specs : dataCars[i].specs
       }
       dataCars[i] = updatedCar
+      fs.writeFileSync(dataCarsPath, JSON.stringify(dataCars))
       return res.status(200).json({
         status: "success",
         data: {
@@ -126,9 +132,9 @@ app.put("/cars/:id", (req, res) => {
       })
     }
   }
-  res.status(404).json({ 
-    status: "fail",
-    message: "Data dengan id tersebut tidak ditemukan",
+  return res.status(404).json({ 
+    status: "failed",
+    message: `Data dengan id ${id} tidak ditemukan`,
   })
 })
 
@@ -139,17 +145,18 @@ app.delete("/cars/:id", (req, res) => {
     if(dataCars[i].id === id) {
       const deletedCar = dataCars[i]
       dataCars.splice(i, 1)
+      fs.writeFileSync(dataCarsPath, JSON.stringify(dataCars))
       return res.status(200).json({
         status: "success",
         data: {
           car: deletedCar
         }
       })
-    }
+    } 
   }
   res.status(404).json({ 
-    status: "fail",
-    message: "Data dengan id tersebut tidak ditemukan",
+    status: "failed",
+    message: `Data dengan id ${id} tidak ditemukan`,
   })
 })
 
