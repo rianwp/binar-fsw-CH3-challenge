@@ -4,7 +4,7 @@ const fs = require("fs")
 
 app.use(express.json())
 
-const port = process.env.port || 3000
+const port = process.env.port || 8000
 
 const dataCarsJson = fs.readFileSync(`${__dirname}/data/data.json`, "utf-8")
 const dataCars = [...JSON.parse(dataCarsJson)]
