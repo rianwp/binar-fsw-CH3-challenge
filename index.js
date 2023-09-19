@@ -4,6 +4,8 @@ const fs = require("fs")
 
 app.use(express.json())
 
+const port = process.env.port || 3000
+
 const dataCarsJson = fs.readFileSync(`${__dirname}/data/data.json`, "utf-8")
 const dataCars = [...JSON.parse(dataCarsJson)]
 
@@ -17,31 +19,22 @@ function isRequiredPropsValid(props) {
   return true
 }
 
-function setHeader(res) {
-  res.set({
-    "Content-type": "application/json",
-  })
-}
 
 function isArrayofStrings(arr) {
   return Array.isArray(arr) && arr.every((element) => typeof element === "string");
 }
 
 app.get("/", (req, res) => {
-  setHeader(res)
   res.status(200).json({ 
     message: "ping successfully",
   })
 })
 
 app.get("/cars", (req, res) => {
-  setHeader(res)
   res.status(200).json(dataCars)
 })
 
 app.get("/cars/:id", (req, res) => {
-  setHeader(res)
-
   const id = req.params.id
 
   for(let i = 0; i < dataCars.length; i++) {
@@ -56,8 +49,6 @@ app.get("/cars/:id", (req, res) => {
 })
 
 app.post("/cars", (req, res) => {
-  setHeader(res)
-
   if(isRequiredPropsValid(req.body)) {
     const { id, plate, manufacture, model, image, rentPerDay, capacity, description, availableAt, transmission, available, type, year, options, specs } = req.body
     const addedCar = {
@@ -86,8 +77,6 @@ app.post("/cars", (req, res) => {
 })
 
 app.put("/cars/:id", (req, res) => {
-  setHeader(res)
-  
   const id = req.params.id
 
   for(let i = 0; i < dataCars.length; i++) {
@@ -120,8 +109,6 @@ app.put("/cars/:id", (req, res) => {
 })
 
 app.delete("/cars/:id", (req, res) => {
-  setHeader(res)
-
   const id = req.params.id
 
   for(let i = 0; i < dataCars.length; i++) {
@@ -136,6 +123,6 @@ app.delete("/cars/:id", (req, res) => {
   })
 })
 
-app.listen(8000, () => {
-  console.log("Server Berjalan")
+app.listen(port, () => {
+  console.log(`Server Berjalan di port ${port}...`)
 })
