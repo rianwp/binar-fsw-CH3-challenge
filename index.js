@@ -26,12 +26,18 @@ function isArrayofStrings(arr) {
 
 app.get("/", (req, res) => {
   res.status(200).json({ 
+    status: "success",
     message: "ping successfully",
   })
 })
 
 app.get("/cars", (req, res) => {
-  res.status(200).json(dataCars)
+  res.status(200).json({
+    status: "success",
+    data: {
+      cars: dataCars
+    }
+  })
 })
 
 app.get("/cars/:id", (req, res) => {
@@ -39,11 +45,17 @@ app.get("/cars/:id", (req, res) => {
 
   for(let i = 0; i < dataCars.length; i++) {
     if(dataCars[i].id === id) {
-      return res.status(200).json(dataCars[i])
+      return res.status(200).json({
+        status: "success",
+        data: {
+          car: dataCars[i]
+        }
+      })
     }
   }
   
   res.status(404).json({ 
+    status: "fail",
     message: "Data dengan id tersebut tidak ditemukan",
   })
 })
@@ -69,9 +81,15 @@ app.post("/cars", (req, res) => {
       specs: isArrayofStrings(specs) ? specs : []
     }
     dataCars.push(addedCar)
-    return res.status(201).json(dataCars)
+    return res.status(201).json({
+      status: "success",
+      data: {
+        cars: dataCars
+      }
+    })
   }
   res.status(400).json({ 
+    status: "fail",
     message: "Request body harus memiliki id, plate, manufacture, dan model dengan format string",
   })
 })
@@ -100,10 +118,16 @@ app.put("/cars/:id", (req, res) => {
         specs: isArrayofStrings(specs) ? specs : dataCars[i].specs
       }
       dataCars[i] = updatedCar
-      return res.status(200).json(updatedCar)
+      return res.status(200).json({
+        status: "success",
+        data: {
+          car: updatedCar
+        }
+      })
     }
   }
   res.status(404).json({ 
+    status: "fail",
     message: "Data dengan id tersebut tidak ditemukan",
   })
 })
@@ -115,10 +139,16 @@ app.delete("/cars/:id", (req, res) => {
     if(dataCars[i].id === id) {
       const deletedCar = dataCars[i]
       dataCars.splice(i, 1)
-      return res.status(200).json(deletedCar)
+      return res.status(200).json({
+        status: "success",
+        data: {
+          car: deletedCar
+        }
+      })
     }
   }
   res.status(404).json({ 
+    status: "fail",
     message: "Data dengan id tersebut tidak ditemukan",
   })
 })
