@@ -45,26 +45,30 @@ app.get("/cars", (req, res) => {
 app.get("/cars/:id", (req, res) => {
   const id = req.params.id
 
-  for(let i = 0; i < dataCars.length; i++) {
-    if(dataCars[i].id === id) {
-      return res.status(200).json({
-        status: "success",
-        data: {
-          car: dataCars[i]
-        }
-      })
-    }
+  const carIndex = dataCars.findIndex(car => car.id === id)
+
+  if(carIndex === -1) {
+    return res.status(404).json({ 
+      status: "failed",
+      message: `Data dengan id ${id} tidak ditemukan`,
+    })
   }
-  
-  res.status(404).json({ 
-    status: "failed",
-    message: `Data dengan id ${id} tidak ditemukan`,
+  res.status(200).json({
+    status: "success",
+    data: {
+      car: dataCars[carIndex]
+    }
   })
 })
 
 app.post("/cars", (req, res) => {
   // terdapat validasi untuk add data, jadi format harus sesuai dengan satuan data pada json
-  if(isRequiredPropsValid(req.body)) {
+  if(!isRequiredPropsValid(req.body)) {
+    return res.status(400).json({ 
+      status: "failed",
+      message: "Request body harus memiliki id, plate, manufacture, dan model dengan format string",
+    })
+  } else {
     const { id, plate, manufacture, model, image, rentPerDay, capacity, description, availableAt, transmission, available, type, year, options, specs } = req.body
     const addedCar = {
       id,
@@ -84,79 +88,80 @@ app.post("/cars", (req, res) => {
       specs: isArrayofStrings(specs) ? specs : []
     }
     dataCars.push(addedCar)
-    fs.writeFileSync(dataCarsPath, JSON.stringify(dataCars))
-    return res.status(201).json({
-      status: "success",
-      data: {
-        cars: dataCars
-      }
+    fs.writeFile(dataCarsPath, JSON.stringify(dataCars), err => {
+      res.status(201).json({
+        status: "success",
+        data: {
+          cars: dataCars
+        }
+      })
     })
   }  
-  res.status(400).json({ 
-    status: "failed",
-    message: "Request body harus memiliki id, plate, manufacture, dan model dengan format string",
-  })
 })
 
 app.put("/cars/:id", (req, res) => {
   // terdapat validasi untuk update data
   const id = req.params.id
 
-  for(let i = 0; i < dataCars.length; i++) {
-    if(dataCars[i].id === id) {
-      const { plate, manufacture, model, image, rentPerDay, capacity, description, availableAt, transmission, available, type, year, options, specs } = req.body
-      const updatedCar = {
-        id: dataCars[i].id,
-        plate: typeof model === "string" ? plate : dataCars[i].plate,
-        manufacture: typeof model === "string" ? manufacture : dataCars[i].manufacture,
-        model: typeof model === "string" ? model : dataCars[i].model,
-        image: typeof image === "string" ? image : dataCars[i].image,
-        rentPerDay: typeof rentPerDay === "number" ? rentPerDay : dataCars[i].rentPerDay,
-        capacity: typeof capacity === "number" ? capacity : dataCars[i].capacity,
-        description: typeof description === "string" ? description : dataCars[i].description,
-        availableAt: typeof availableAt === "string" ? availableAt : dataCars[i].availableAt,
-        transmission: typeof transmission === "string" ? transmission : dataCars[i].transmission,
-        available: typeof available === "boolean" ? available : dataCars[i].available,
-        type: typeof type === "string" ? type : dataCars[i].type,
-        year: typeof year === "number" ? year : dataCars[i].year,
-        options: isArrayofStrings(options) ? options : dataCars[i].options,
-        specs: isArrayofStrings(specs) ? specs : dataCars[i].specs
-      }
-      dataCars[i] = updatedCar
-      fs.writeFileSync(dataCarsPath, JSON.stringify(dataCars))
-      return res.status(200).json({
-        status: "success",
-        data: {
-          car: updatedCar
-        }
-      })
-    }
+  const carIndex = dataCars.findIndex(car => car.id === id)
+
+  if(carIndex === -1) {
+    return res.status(404).json({ 
+      status: "failed",
+      message: `Data dengan id ${id} tidak ditemukan`,
+    })
   }
-  return res.status(404).json({ 
-    status: "failed",
-    message: `Data dengan id ${id} tidak ditemukan`,
+  
+  const { plate, manufacture, model, image, rentPerDay, capacity, description, availableAt, transmission, available, type, year, options, specs } = req.body
+  const updatedCar = {
+    id: dataCars[carIndex].id,
+    plate: typeof model === "string" ? plate : dataCars[carIndex].plate,
+    manufacture: typeof model === "string" ? manufacture : dataCars[carIndex].manufacture,
+    model: typeof model === "string" ? model : dataCars[carIndex].model,
+    image: typeof image === "string" ? image : dataCars[carIndex].image,
+    rentPerDay: typeof rentPerDay === "number" ? rentPerDay : dataCars[carIndex].rentPerDay,
+    capacity: typeof capacity === "number" ? capacity : dataCars[carIndex].capacity,
+    description: typeof description === "string" ? description : dataCars[carIndex].description,
+    availableAt: typeof availableAt === "string" ? availableAt : dataCars[carIndex].availableAt,
+    transmission: typeof transmission === "string" ? transmission : dataCars[i].transmission,
+    available: typeof available === "boolean" ? available : dataCars[carIndex].available,
+    type: typeof type === "string" ? type : dataCars[carIndex].type,
+    year: typeof year === "number" ? year : dataCars[carIndex].year,
+    options: isArrayofStrings(options) ? options : dataCars[carIndex].options,
+    specs: isArrayofStrings(specs) ? specs : dataCars[carIndex].specs
+  }
+  dataCars[carIndex] = updatedCar
+  fs.writeFile(dataCarsPath, JSON.stringify(dataCars), err => {
+    res.status(200).json({
+      status: "success",
+      data: {
+        car: updatedCar
+      }
+    })
   })
 })
 
 app.delete("/cars/:id", (req, res) => {
   const id = req.params.id
 
-  for(let i = 0; i < dataCars.length; i++) {
-    if(dataCars[i].id === id) {
-      const deletedCar = dataCars[i]
-      dataCars.splice(i, 1)
-      fs.writeFileSync(dataCarsPath, JSON.stringify(dataCars))
-      return res.status(200).json({
-        status: "success",
-        data: {
-          car: deletedCar
-        }
-      })
-    } 
+  const carIndex = dataCars.findIndex(car => car.id === id)
+
+  if(carIndex === -1) {
+    return res.status(404).json({ 
+      status: "failed",
+      message: `Data dengan id ${id} tidak ditemukan`,
+    })
   }
-  res.status(404).json({ 
-    status: "failed",
-    message: `Data dengan id ${id} tidak ditemukan`,
+
+  const deletedCar = dataCars[carIndex]
+  dataCars.splice(carIndex, 1)
+  fs.writeFile(dataCarsPath, JSON.stringify(dataCars), err => {
+    res.status(200).json({
+      status: "success",
+      data: {
+        car: deletedCar
+      }
+    })
   })
 })
 
