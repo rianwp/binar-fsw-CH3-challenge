@@ -50,12 +50,6 @@ const getCarById = (req, res) => {
 
 	const carIndex = dataCars.findIndex((car) => car.id === id)
 
-	if (carIndex === -1) {
-		return res.status(404).json({
-			status: 'failed',
-			message: `Data dengan id ${id} tidak ditemukan`,
-		})
-	}
 	res.status(200).json({
 		status: 'success',
 		data: {
